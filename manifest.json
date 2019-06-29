@@ -38,7 +38,7 @@
     ],
     "content_scripts": [
         {
-          "matches": ["*://*/*","https://www.youtube.com/","http://*/*", "https://*/*"],
+          "matches": ["*://*/*","https://www.youtube.com/watch?*","http://*/*", "https://*/*"],
           "js":["content.js"],
           "all_frames": true
         }

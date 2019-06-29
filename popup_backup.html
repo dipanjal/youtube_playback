@@ -3,7 +3,6 @@
 
 <head>
   <title>Quick Click Launcher</title>
-  <script src="./libs/jquery-3.4.1.min.js"></script>
   <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
   <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"
     integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -26,19 +25,6 @@
       font-weight: 400;
       margin: 0;
       color: #2f5876;
-    }
-
-    input[type=text] {
-      margin: 8px 0;
-      box-sizing: border-box;
-      -webkit-transition: width 0.50s ease-in-out;
-      transition: width 0.50s ease-in-out;
-    }
-    input[type=button], input[type=submit], input[type=reset], button {
-      background-color: #4CAF50;
-      color: white;
-      cursor: pointer;
-      border-radius: 2px;
     }
 
     a:link,
@@ -107,7 +93,6 @@
 </head>
 
 <body>
-
   <div class="modal-header">
     <h1 class="logo">
       <img class="logo-icon" src="/images/icon-128.png">Quick Click
@@ -117,13 +102,40 @@
   <div class="modal-content">
     <p>Easily Access of Media content</p>
   </div>
-  <div>
-    <div>
-      <input type="text" name="url" id="url_box" placeholder="youtube track url"/>
-      <button id="_add" alt="add to playlist" style="width:40px;">Add</button>
+  <div class="modal-icons">
+    <div class="flex-container">
+      <div class="flex">
+        <a href="http://flms-dashboard.ratoolkit.com/" title="flms-dashboard" target="_blank">
+          <img src="/images/icon-128.png" alt="flms-dashboard" style="width:40px;">
+        </a>
+      </div>
+      <div class="flex">
+        <a href="https://www.facebook.com" target="_blank">
+          <i class="fa fa-facebook" title="Facebook"></i>
+        </a>
+      </div>
+      <div class="flex">
+        <a href="https://in.linkedin.com/" target="_blank">
+          <i class="fa fa-linkedin" title="Linkedin"></i>
+        </a>
+      </div>
+      <div class="flex">
+        <a href="https://www.youtube.com" target="_blank">
+          <i class="fa fa-youtube" title="Youtube"></i>
+        </a>
+      </div>
+      <div class="flex">
+        <a href="https://realacquisitions.teamwork.com" target="_blank">
+          <span class="fa" title="Teamwork">T</span>
+        </a>
+      </div>
+      <div class="flex">
+        <a href="https://www.gitlab.com" target="_blank">
+          <i class="fa fa-gitlab" title="gitlab"></i>
+        </a>
+      </div>
     </div>
   </div>
-
 </body>
 
 </html>
