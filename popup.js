@@ -23,12 +23,17 @@ $(function(){
 	});
 
 	$("#url_input").on('click', event =>{
-		setTextBoxValueFromCleapboard();
+		setTextValueFromCleapboard();
 	});
 
 	$("#_clear_all").on('click', event =>{
 		clearPlaylist();
 	});
+
+	$("#_previous").on('click', event =>{
+		console.log("clicked prev")
+		window.history.back();
+	})
 });
 
 function isValid(url){
@@ -39,7 +44,7 @@ function isValid(url){
 	return false;
 }
 
-function setTextBoxValueFromCleapboard() {
+function setTextValueFromCleapboard() {
 	console.log('getClipboard()');
 	var result = null;
 	
@@ -61,11 +66,9 @@ function setTextBoxValueFromCleapboard() {
     return result;
 }
 
-function addToPlayList(urlVal) {
+function addToPlayList(urlVal,prior=false) {
 	console.log("addToPlayList()")
-	// Get a value saved in a form.
 	var theValue = urlVal;
-	// Check that there's some code there.
 	if (!theValue) {
 		console.log('Error: No value specified');
 	  	return;
