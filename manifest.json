@@ -31,7 +31,9 @@
         "tabs",
         "webNavigation",
         "activeTab",
+        "contextMenus",
         "storage",
+        "clipboardRead",
         "*://*/*",
         "http://*/*",
         "https://*/*"

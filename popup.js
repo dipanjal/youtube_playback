@@ -10,16 +10,56 @@ function onLoad(){
 
 $(function(){
 	console.log('jquery-working');
+
 	$("#_add").on('click', event=>{
-		let urlVal = $("#url_box").val();
-		var regexp = /https:\/\/www.youtube.com\/watch\?v=[A-Z,a-z,0-9]+/g;
-		if(regexp.test(urlVal)){
+		alert('clicked')
+		let urlVal = $("#url_input").val();
+		// var regexp = /https:\/\/www.youtube.com\/watch\?v=[A-Z,a-z,0-9]+/g;
+		if(isValid(urlVal)){
 			console.log(urlVal);
 			addToPlayList(urlVal);
 			// console.log(localStorage.playlist)
 		}
 	});
+
+	$("#url_input").on('click', event =>{
+		setTextBoxValueFromCleapboard();
+	});
+
+	$("#_clear_all").on('click', event =>{
+		clearPlaylist();
+	});
 });
+
+function isValid(url){
+	var regexp = /https:\/\/www.youtube.com\/watch\?v=[A-Z,a-z,0-9]+/g;
+	if(regexp.test(url)){
+		return true;
+	}
+	return false;
+}
+
+function setTextBoxValueFromCleapboard() {
+	console.log('getClipboard()');
+	var result = null;
+	
+	var textarea = $('#url_input');
+	var prevText = textarea.val();
+
+    textarea.val('');
+    textarea.select();
+
+    if (document.execCommand('paste')) {
+		result = textarea.val();
+		if(!isValid(result)){
+			textarea.val(prevText);
+			return;
+		}
+    } else {
+        console.error('failed to get clipboard content');
+    }
+    return result;
+}
 
 function addToPlayList(urlVal) {
 	console.log("addToPlayList()")
@@ -41,6 +81,10 @@ function addToPlayList(urlVal) {
 			var dataArr = [urlVal];
 			save(JSON.stringify(dataArr));
 		}
+
+		if (chrome.runtime.lastError) {
+			console.log('Get Error');
+		}
     });
   }
 function save(dataSerialized){
@@ -48,5 +92,16 @@ function save(dataSerialized){
 		// Notify that we saved.
 		console.log('data saved');
 		console.log(dataSerialized);
+	});
+
+	if (chrome.runtime.lastError) {
+		console.log('Save Error');
+	}
+}
+
+function clearPlaylist(){
+	console.log("clearPlaylist");
+	chrome.storage.sync.clear(()=>{
+		console.log("cleared")
 	});
 }
