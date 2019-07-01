@@ -11,6 +11,10 @@ function onLoad(){
 $(function(){
 	console.log('jquery-working');
 
+	chrome.storage.local.get('playlist', (result) => {
+		console.log(result)
+    });
+
 	$("#_add").on('click', event=>{
 		let urlVal = $("#url_input").val();
 		// var regexp = /https:\/\/www.youtube.com\/watch\?v=[A-Z,a-z,0-9]+/g;
@@ -72,7 +76,7 @@ function addToPlayList(urlVal,prior=false) {
 	  	return;
 	}
 
-	chrome.storage.sync.get('playlist', (result) => {
+	chrome.storage.local.get('playlist', (result) => {
 		if(result.playlist){
 			var dataArr = JSON.parse(result.playlist);
 			dataArr.push(urlVal)
@@ -89,7 +93,7 @@ function addToPlayList(urlVal,prior=false) {
     });
   }
 function save(dataSerialized){
-	chrome.storage.sync.set({'playlist': dataSerialized}, () => {
+	chrome.storage.local.set({'playlist': dataSerialized}, () => {
 		// Notify that we saved.
 		console.log('data saved');
 		console.log(dataSerialized);
@@ -103,7 +107,7 @@ function save(dataSerialized){
 function clearPlaylist(){
 	console.log("clearPlaylist");
 	try{
-		chrome.storage.sync.clear(()=>{
+		chrome.storage.local.clear(()=>{
 			console.log("cleared")
 		});
 	}catch(err){

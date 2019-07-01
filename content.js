@@ -1,5 +1,5 @@
-var isPlaying = true;
-// var wait = false;
+let isPlaying = true;
+// let wait = false;
 // console.log('content script')
 window.addEventListener('load',event=>{
 	console.log('windown loaded')
@@ -11,9 +11,9 @@ window.addEventListener('load',event=>{
 
     chrome.storage.onChanged.addListener(function(changes, namespace) {
     	console.log('storage change called');
-		var key = 'playlist';
-		var storageChange = changes[key];
-		console.log(storageChange);
+		let key = 'playlist';
+		let storageChange = changes[key];
+		// console.log(storageChange);
 		if(storageChange){
 
 			console.log('Storage key "%s" in namespace "%s" changed. ' +
@@ -24,14 +24,23 @@ window.addEventListener('load',event=>{
 						storageChange.newValue);
 
 			if(storageChange.newValue){
-				var newValueArr = JSON.parse(storageChange.newValue);
-				console.log('new value length '+newValueArr.length);
+				let newValueArr = JSON.parse(storageChange.newValue);
+				// console.log('new value length '+newValueArr.length);
 				console.log("isplaying.."+isPlaying);
-				// console.log('go to next track');
-				// changeTrack(newValueArr);
+
+				/**
+				 * when no video is playing and 
+				 * the playlist is empty
+				 * ------------------------
+				 * just add a song into playlist and 
+				 * browser will redirect to the video
+				 */
 				if(!isPlaying){
-					console.log('go to next track');
-					changeTrack(newValueArr);
+					if(!storageChange.oldValue || JSON.parse(storageChange.oldValue).length==0){
+						console.log('go to final next track');
+						changeTrack(newValueArr);
+					}
+					// if(newValueArr.length==1)
 				}
 			}
 		}
@@ -41,18 +50,17 @@ window.addEventListener('load',event=>{
 });
 
 function monitorYTPlayer(document){
-	var videoTag = document.querySelector('video');
+	let videoTag = document.querySelector('video');
 	if(videoTag){
 		console.log('video player found');
 		videoTag.addEventListener('ended',function(){
 			console.log("video ended");
 			isPlaying = false;
 			try{
-				chrome.storage.sync.get('playlist', (result) => {
-					console.log("fetch playlist")
-
+				chrome.storage.local.get('playlist', (result) => {
+					// console.log("fetch playlist")
 					if(result.playlist){
-						var playListArr = JSON.parse(result.playlist);
+						let playListArr = JSON.parse(result.playlist);
 						if(playListArr.length>0){
 							changeTrack(playListArr);
 						}
@@ -65,56 +73,20 @@ function monitorYTPlayer(document){
 		});
 	}
 }
-
-// function monitorYTPlayer(document_root) {
-// 	console.log('Monitor YTPlayer')
-// 	var totalTimeTag = document_root.getElementsByClassName("ytp-time-duration")[0];
-// 	if(totalTimeTag){
-// 		var totalTime = totalTimeTag.innerHTML;
-// 		setInterval(function(){
-// 			console.log("isPlaying... "+isPlaying);
-// 			if(isPlaying){
-// 				var playPauseButton = document_root.querySelector(".ytp-play-button.ytp-button");
-// 				var playerState =  playPauseButton.getAttribute("aria-label");
-// 				var watchTime = document_root.getElementsByClassName("ytp-time-current")[0].innerHTML
-// 				if(watchTime===totalTime){
-// 					// wait=true;
-// 					isPlaying = false;
-// 					try{
-// 						chrome.storage.sync.get('playlist', (result) => {
-// 							if(result.playlist){
-// 								var playListArr = JSON.parse(result.playlist);
-// 								if(playListArr.length>0){
-// 									// console.log("Travars Next Track");
-// 									changeTrack(playListArr);
-// 								}else{
-// 									// wait = false;
-// 								}
-// 							}
-// 						});	
-// 					}catch(err){
-// 						console.log(err);
-// 					}
-					
-// 				}
-// 			}
-			
-// 		},1000);
-// 	}
-// }
-
-
-
 function changeTrack(playListArr){
 	console.log("next track");
-    var nextTrack = playListArr.shift();
+	let nextTrack = playListArr.shift();
+	console.log("Now PLaying");
     console.log(nextTrack);
-	var dataSerialized = JSON.stringify(playListArr);
-	chrome.storage.sync.set({'playlist': dataSerialized}, () => {
-		console.log('playlist updated');
+	let dataSerialized = JSON.stringify(playListArr);
+	chrome.storage.local.set({'playlist': dataSerialized}, () => {
+		console.log('current playlist');
 		console.log(dataSerialized);
 		// wait = false;
 		isPlaying = true;
+		// setTimeout(function(){
+		// 	console.log('delayed')
+		// },5000);
 		// Simulate a mouse click:
 		// window.location.href = nextTrack;
 		window.location.replace(nextTrack.toString());
@@ -122,18 +94,18 @@ function changeTrack(playListArr){
 }
 
 function injectHTML(document){
-    var tags = document.getElementsByTagName("ytd-compact-video-renderer");
-    var oldCount = tags.length;
+    let tags = document.getElementsByTagName("ytd-compact-video-renderer");
+    let oldCount = tags.length;
     
     setInterval(function(){
         tags = document.getElementsByTagName("ytd-compact-video-renderer");
-        var newCount = tags.length;
+        let newCount = tags.length;
         if(oldCount!=newCount){
             oldCount = newCount;
-            for(var i=0; i<newCount; i++){
-                var tag = tags[i];
+            for(let i=0; i<newCount; i++){
+                let tag = tags[i];
                 if(!tag.getElementsByClassName("add_to_play_list")[0]){
-                    var node="<div class='add_to_play_list'>Add to playlist</div>";
+                    let node="<div class='add_to_play_list'>Add to playlist</div>";
                     tag.innerHTML+=node;
                     console.log(tag);
                 }
