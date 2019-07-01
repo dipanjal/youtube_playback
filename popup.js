@@ -12,13 +12,11 @@ $(function(){
 	console.log('jquery-working');
 
 	$("#_add").on('click', event=>{
-		alert('clicked')
 		let urlVal = $("#url_input").val();
 		// var regexp = /https:\/\/www.youtube.com\/watch\?v=[A-Z,a-z,0-9]+/g;
 		if(isValid(urlVal)){
 			console.log(urlVal);
 			addToPlayList(urlVal);
-			// console.log(localStorage.playlist)
 		}
 	});
 
@@ -31,7 +29,7 @@ $(function(){
 	});
 
 	$("#_previous").on('click', event =>{
-		console.log("clicked prev")
+		console.log("clicked prev");
 		window.history.back();
 	})
 });
@@ -104,7 +102,11 @@ function save(dataSerialized){
 
 function clearPlaylist(){
 	console.log("clearPlaylist");
-	chrome.storage.sync.clear(()=>{
-		console.log("cleared")
-	});
+	try{
+		chrome.storage.sync.clear(()=>{
+			console.log("cleared")
+		});
+	}catch(err){
+		console.log(err);
+	}
 }

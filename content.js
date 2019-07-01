@@ -2,36 +2,55 @@ var isPlaying = true;
 // var wait = false;
 // console.log('content script')
 window.addEventListener('load',event=>{
-	// console.log('windown loaded')
+	console.log('windown loaded')
+
+	document.addEventListener('yt-navigate-start',function(){
+		console.log('navigated');
+		monitorYTPlayer(document);
+	});
+
     chrome.storage.onChanged.addListener(function(changes, namespace) {
+    	console.log('storage change called');
 		var key = 'playlist';
 		var storageChange = changes[key];
+		console.log(storageChange);
 		if(storageChange){
 
-			// if(storageChange.newValue && storageChange.newValue.length>0){
-			// 	// wait=false;
-			// 	isPlaying = true;
-			// }
-			
 			console.log('Storage key "%s" in namespace "%s" changed. ' +
-                        'Old value was "%s", new value is "%s".',
+                        'Old value was "%s", new value is "%s"."',
                         key,
                         namespace,
                         storageChange.oldValue,
-                        storageChange.newValue);
-		}
+						storageChange.newValue);
 
+			if(storageChange.newValue){
+				var newValueArr = JSON.parse(storageChange.newValue);
+				console.log('new value length '+newValueArr.length);
+				console.log("isplaying.."+isPlaying);
+				// console.log('go to next track');
+				// changeTrack(newValueArr);
+				if(!isPlaying){
+					console.log('go to next track');
+					changeTrack(newValueArr);
+				}
+			}
+		}
 	});
 	
-	// monitorYTPlayer(document);
+	monitorYTPlayer(document);
+});
 
+function monitorYTPlayer(document){
 	var videoTag = document.querySelector('video');
 	if(videoTag){
 		console.log('video player found');
 		videoTag.addEventListener('ended',function(){
-			// console.log('ended')
+			console.log("video ended");
+			isPlaying = false;
 			try{
 				chrome.storage.sync.get('playlist', (result) => {
+					console.log("fetch playlist")
+
 					if(result.playlist){
 						var playListArr = JSON.parse(result.playlist);
 						if(playListArr.length>0){
@@ -45,8 +64,7 @@ window.addEventListener('load',event=>{
 			
 		});
 	}
-
-});
+}
 
 // function monitorYTPlayer(document_root) {
 // 	console.log('Monitor YTPlayer')
@@ -88,6 +106,7 @@ window.addEventListener('load',event=>{
 
 
 function changeTrack(playListArr){
+	console.log("next track");
     var nextTrack = playListArr.shift();
     console.log(nextTrack);
 	var dataSerialized = JSON.stringify(playListArr);
@@ -95,9 +114,10 @@ function changeTrack(playListArr){
 		console.log('playlist updated');
 		console.log(dataSerialized);
 		// wait = false;
-		// isPlaying = true;
+		isPlaying = true;
 		// Simulate a mouse click:
-		window.location.href = nextTrack;
+		// window.location.href = nextTrack;
+		window.location.replace(nextTrack.toString());
 	});
 }
 
