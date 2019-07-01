@@ -19,7 +19,7 @@
         "default_popup": "popup.html"
     },
     "background": {
-       "scripts": ["playlist_service.js","eventpage.js"],
+       "scripts": ["playlist_service.js","eventpage.js","background.js"],
        "persistent": false
    },
     "chrome_url_overrides":{

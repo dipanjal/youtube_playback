@@ -1,12 +1,15 @@
-let isPlaying = true;
+let isPlaying = false;
 // let wait = false;
 // console.log('content script')
 window.addEventListener('load',event=>{
-	console.log('windown loaded')
+	console.log(event);
+	// isPlaying = isWatchPage();
+	determinePLayingState(document);
+	console.log('isPlaying: '+isPlaying);
 
 	document.addEventListener('yt-navigate-start',function(){
 		console.log('navigated');
-		monitorYTPlayer(document);
+		window.location.reload();
 	});
 
     chrome.storage.onChanged.addListener(function(changes, namespace) {
@@ -26,7 +29,7 @@ window.addEventListener('load',event=>{
 			if(storageChange.newValue){
 				let newValueArr = JSON.parse(storageChange.newValue);
 				// console.log('new value length '+newValueArr.length);
-				console.log("isplaying.."+isPlaying);
+				console.log("isPlaying: "+isPlaying);
 
 				/**
 				 * when no video is playing and 
@@ -49,10 +52,54 @@ window.addEventListener('load',event=>{
 	monitorYTPlayer(document);
 });
 
+function isWatchPage(){
+	var regexp = /https:\/\/www.youtube.com\/watch\?v=[A-Z,a-z,0-9]+/g;
+	let url = document.location.href;
+	if(regexp.test(url)){
+		return true;
+	}
+	return false;
+}
+
+
+function determinePLayingState(document){
+	try{
+		// if(document.querySelector("ytd-app").getAttributeNode("is-watch-page")){
+		// 	console.log('watch-page');
+		// 	console.log(document.querySelector('video').readyState);
+		// 	isPlaying = true;
+		// }else{
+		// 	console.log('not watch page')
+		// 	isPlaying = false;
+		// }
+		var interval = null;
+		if(isWatchPage()){
+			console.log("watch page");
+			interval = window.setInterval(function(){
+				if(document.getElementsByClassName("ytp-play-button")[0].getAttribute("aria-label") === "Pause (k)"){
+					isPlaying = true;
+					clearInterval(interval);
+				}else{
+					isPlaying = false;
+				}
+				console.log("playing: "+isPlaying);
+			},1000)
+		}else {
+			console.log("not a watch page");
+			if(interval)
+				clearInterval(interval);
+		}
+	}catch(err){
+		console.log(err)
+		isPlaying = false;
+	}
+}
+
 function monitorYTPlayer(document){
 	let videoTag = document.querySelector('video');
 	if(videoTag){
 		console.log('video player found');
+		// determinePLayingState(document);
 		videoTag.addEventListener('ended',function(){
 			console.log("video ended");
 			isPlaying = false;
@@ -68,13 +115,13 @@ function monitorYTPlayer(document){
 				});	
 			}catch(err){
 				console.log(err);
+				isPlaying = false;
 			}
 			
 		});
 	}
 }
 function changeTrack(playListArr){
-	console.log("next track");
 	let nextTrack = playListArr.shift();
 	console.log("Now PLaying");
     console.log(nextTrack);
@@ -82,13 +129,7 @@ function changeTrack(playListArr){
 	chrome.storage.local.set({'playlist': dataSerialized}, () => {
 		console.log('current playlist');
 		console.log(dataSerialized);
-		// wait = false;
 		isPlaying = true;
-		// setTimeout(function(){
-		// 	console.log('delayed')
-		// },5000);
-		// Simulate a mouse click:
-		// window.location.href = nextTrack;
 		window.location.replace(nextTrack.toString());
 	});
 }
