@@ -8,6 +8,11 @@
 //    source: DOMtoString(document)
 // });
 
+
+if (chrome.runtime.lastError) {
+	console.log("playlist service error");
+}
+
 function addToPlayList(urlVal,prior=false) {
 	console.log("addToPlayList() called")
 	var theValue = urlVal;
@@ -33,6 +38,10 @@ function addToPlayList(urlVal,prior=false) {
     });
   }
 
+ /**
+  * SERVICES FOR PLAYLIST
+  */
+
 function save(dataSerialized){
 	chrome.storage.local.set({'playlist': dataSerialized}, () => {
 		// Notify that we saved.
@@ -55,4 +64,19 @@ function clearPlaylist(){
 	}catch(err){
 		console.log(err);
 	}
+}
+
+function getAll(callback){
+	chrome.storage.local.get('playlist', (result) => {
+		if(result.playlist){
+			var dataArr = JSON.parse(result.playlist);
+			callback(null,dataArr);
+			
+		}else{
+			callback(null,null);
+		}
+		if (chrome.runtime.lastError) {
+			callback(chrome.runtime.lastError,null);
+		}
+    });
 }

@@ -2,8 +2,14 @@ let isPlaying = false;
 // let wait = false;
 // console.log('content script')
 window.addEventListener('load',event=>{
-	console.log(event);
-	// isPlaying = isWatchPage();
+
+	// chrome.runtime.onMessage.addListener( (any,sender,callback) => {
+	// 	console.log("received message from background");
+	// 	console.log(sender);
+	// 	console.log(any);
+	// 	callback("ok");
+	// })
+
 	determinePLayingState(document);
 	console.log('isPlaying: '+isPlaying);
 
@@ -28,7 +34,6 @@ window.addEventListener('load',event=>{
 
 			if(storageChange.newValue){
 				let newValueArr = JSON.parse(storageChange.newValue);
-				// console.log('new value length '+newValueArr.length);
 				console.log("isPlaying: "+isPlaying);
 
 				/**
@@ -90,7 +95,7 @@ function determinePLayingState(document){
 				clearInterval(interval);
 		}
 	}catch(err){
-		console.log(err)
+		console.log(err);
 		isPlaying = false;
 	}
 }

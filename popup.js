@@ -69,13 +69,12 @@ function setTextValueFromCleapboard() {
 }
 
 function addToPlayList(urlVal,prior=false) {
-	console.log("addToPlayList()")
-	var theValue = urlVal;
-	if (!theValue) {
+	console.log("addToPlayList()");
+	if (!urlVal) {
 		console.log('Error: No value specified');
 	  	return;
 	}
-
+	if(isValid)
 	chrome.storage.local.get('playlist', (result) => {
 		if(result.playlist){
 			var dataArr = JSON.parse(result.playlist);
