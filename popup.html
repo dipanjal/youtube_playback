@@ -3,7 +3,7 @@
   
 
 <head>
-  <title>Quick Click Launcher</title>
+  <title>Youtube Playback</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <script src="./libs/jquery-3.4.1.min.js"></script>
   <link rel="stylesheet" href="./libs/bootstrap/css/bootstrap.css">
@@ -12,7 +12,7 @@
   <!-- <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
   <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"
     integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous"> -->
-    
+    <script src="./playlist_service.js"></script>
   <script src="popup.js"></script>
 </head>
 
@@ -20,7 +20,7 @@
 
   <div class="modal-header">
     <h1 class="logo">
-      <img class="logo-icon" src="/images/icon-128.png">Quick Click
+      <img class="logo-icon" src="/images/icon-128.png">YT Playback
       <span class="version">(1.0.0)</span>
     </h1>
   </div>
@@ -32,15 +32,19 @@
       <button class="button" id="_add" alt="add to playlist" style="width:40px;">Add</button>
     </div>
   </div> -->
+  <div id="_label" class="alert alert-primary" role="alert" hidden>
+      No Next Track in Playlist
+  </div>
+  <form id="popup_form" class="flex-container col-md-10">
 
-
-  <form class="flex-container col-md-10">
       <div class="form-group">
-        <label for="url_box">Email address</label>
         <input type="text" class="form-control" id="url_input" autocomplete="off"  placeholder="Paste Youtube Url">
       </div>
       <div class="form-group">
           <button id="_add" class="btn btn-primary col-md-10">Add To Playlist</button>  
+      </div>
+      <div class="form-group">
+          <button id="_resume" hidden="true" class="btn btn-success col-md-10">Resume Playlist</button>
       </div>
       <div class="form-group">
           <button id="_clear_all" class="btn btn-danger col-md-10">Clear Playlist</button>  

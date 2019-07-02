@@ -8,75 +8,112 @@
 //    source: DOMtoString(document)
 // });
 
+/**
+ * A dedicated service for playlist crud operation
+ */
 
 if (chrome.runtime.lastError) {
 	console.log("playlist service error");
 }
 
-function addToPlayList(urlVal,prior=false) {
-	console.log("addToPlayList() called")
-	var theValue = urlVal;
-	if (!theValue) {
-		console.log('Error: No value specified');
-	  	return;
+function isValidUrl(url){
+	let regexp = /https:\/\/www.youtube.com\/watch\?v=[A-Z,a-z,0-9]+/g;
+	if(regexp.test(url)){
+		return true;
 	}
+	return false;
+}
 
-	chrome.storage.local.get('playlist', (result) => {
-		if(result.playlist){
-			var dataArr = JSON.parse(result.playlist);
-			dataArr.push(urlVal)
-			save(JSON.stringify(dataArr));
+/**
+ *
+ * @returns {Promise<array,err>}
+ */
+function getPlaylistData(){
+	return new Promise((resolve, reject) => {
+		chrome.storage.local.get('playlist', (result) => {
+			if(result.playlist){
+				let dataArr = JSON.parse(result.playlist);
+				if(dataArr && dataArr.length>0){
+					resolve(dataArr);
+				}else{
+					resolve(null);
+				}
+			}else{
+				resolve(null);
+			}
+			if (chrome.runtime.lastError) {
+				reject(chrome.runtime.lastError);
+			}
+		});
+	});
+}
+
+/**
+ *
+ * @param urlVal
+ * @returns {Promise<err,currentPlaylistArr>}
+ */
+function addToPlayList(urlVal) {
+	return new Promise((resolve, reject) => {
+		console.log("addToPlayList()");
+		if (!urlVal) {
+			reject('Error: No value specified');
+		}
+		else if(isValidUrl(urlVal)){
+			getPlaylistData().then(data=>{
+				data?data.push(urlVal):data = [urlVal];
+				return save(JSON.stringify(data));
+			}).then(currentPlaylistArr => {
+				console.log(currentPlaylistArr);
+				resolve(currentPlaylistArr)
+			}).catch(err=>console.log(err));
 		}else{
-			console.log("storage empty");
-			var dataArr = [urlVal];
-			save(JSON.stringify(dataArr));
+			reject("invalid url: "+urlVal);
 		}
+	});
 
-		if (chrome.runtime.lastError) {
-			console.log('Get Error');
-		}
-    });
-  }
+}
 
  /**
   * SERVICES FOR PLAYLIST
   */
 
+/**
+ * SAVE
+ * @param dataSerialized ==> Serialized DataArray
+ */
 function save(dataSerialized){
-	chrome.storage.local.set({'playlist': dataSerialized}, () => {
-		// Notify that we saved.
-		console.log('data saved');
-		console.log(dataSerialized);
+	return new Promise((resolve, reject) => {
+		chrome.storage.local.set({'playlist': dataSerialized}, () => {
+			console.log('Playlist Updated');
+			resolve(JSON.parse(dataSerialized));
+		});
+		if (chrome.runtime.lastError) {
+			console.log('Save Error');
+			reject(chrome.runtime.lastError);
+		}
 	});
 
-	if (chrome.runtime.lastError) {
-		console.log('Save Error');
-	}
 }
 
-
+/**
+ *
+ * @returns {Promise<boolean,error>}
+ */
 function clearPlaylist(){
-	console.log("clearPlaylist");
-	try{
-		chrome.storage.local.clear(()=>{
-			console.log("cleared")
-		});
-	}catch(err){
-		console.log(err);
-	}
-}
-
-function getAll(callback){
-	chrome.storage.local.get('playlist', (result) => {
-		if(result.playlist){
-			var dataArr = JSON.parse(result.playlist);
-			callback(null,dataArr);
-			
-		}else{
-			callback(null,null);
+	return new Promise((resolve,reject)=>{
+		try{
+			chrome.storage.local.clear(()=>{
+				console.log("playlist cleared")
+				resolve(true);
+			});
+		}catch(err){
+			console.log(err);
+			reject(err);
 		}
 		if (chrome.runtime.lastError) {
-			callback(chrome.runtime.lastError,null);
+			reject(chrome.runtime.lastError)
 		}
-    });
+	});
 }
+

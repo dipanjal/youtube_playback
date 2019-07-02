@@ -1,27 +1,47 @@
-window.load=onLoad();
-
-function onLoad(){
-// 	chrome.tabs.executeScript(null, {file: "playlist_service.js"}, function() {
-//     	if (chrome.runtime.lastError) {
-// 			console.log('popup script error');
-//      	}
-//    });
-}
+// window.load=onLoad();
+//
+// function onLoad(){
+// // 	chrome.tabs.executeScript(null, {file: "playlist_service.js"}, function() {
+// //     	if (chrome.runtime.lastError) {
+// // 			console.log('popup script error');
+// //      	}
+// //    });
+// }
 
 $(function(){
 	console.log('jquery-working');
 
-	chrome.storage.local.get('playlist', (result) => {
-		console.log(result)
-    });
+
+	getPlaylistData().then(data=>{
+		console.log(data)
+		// if(data)
+		// $("#_label").text()
+		// console.log(data)
+	}).catch(err=>console.log(err));
 
 	$("#_add").on('click', event=>{
 		let urlVal = $("#url_input").val();
-		// var regexp = /https:\/\/www.youtube.com\/watch\?v=[A-Z,a-z,0-9]+/g;
-		if(isValid(urlVal)){
-			console.log(urlVal);
-			addToPlayList(urlVal);
+		if(isValidUrl(urlVal)){
+			addToPlayList(urlVal)
+				.then(currentPlaylist=>{
+					console.log(currentPlaylist);
+					alert("video added to playlist");
+				})
+				.catch(err=>console.log(err));
+
+			// let requestBody = {
+			// 	action:"addToPlaylist",
+			// 	data: urlVal
+			// };
+			// /**
+			//  * Requesting Background Script To addToPlaylist()
+			//  */
+			// chrome.runtime.sendMessage(requestBody, function(response) {
+			// 	console.log(response);
+			// });
+
 		}
+
 	});
 
 	$("#url_input").on('click', event =>{
@@ -29,36 +49,32 @@ $(function(){
 	});
 
 	$("#_clear_all").on('click', event =>{
-		clearPlaylist();
+		clearPlaylist().then(isCleared=> console.log("playlist cleared "+isCleared))
+			.catch(err=> console.log(err));
 	});
 
-	$("#_previous").on('click', event =>{
-		console.log("clicked prev");
-		window.history.back();
-	})
+	$(document).on('click',"#_resume", event =>{
+		console.log("resume playlist");
+		// window.history.back();
+	});
+
+
 });
 
-function isValid(url){
-	var regexp = /https:\/\/www.youtube.com\/watch\?v=[A-Z,a-z,0-9]+/g;
-	if(regexp.test(url)){
-		return true;
-	}
-	return false;
-}
 
 function setTextValueFromCleapboard() {
 	console.log('getClipboard()');
-	var result = null;
-	
-	var textarea = $('#url_input');
-	var prevText = textarea.val();
+	let result = null;
+
+	let textarea = $('#url_input');
+	let prevText = textarea.val();
 
     textarea.val('');
     textarea.select();
 
     if (document.execCommand('paste')) {
 		result = textarea.val();
-		if(!isValid(result)){
+		if(!isValidUrl(result)){
 			textarea.val(prevText);
 			return;
 		}
@@ -68,48 +84,10 @@ function setTextValueFromCleapboard() {
     return result;
 }
 
-function addToPlayList(urlVal,prior=false) {
-	console.log("addToPlayList()");
-	if (!urlVal) {
-		console.log('Error: No value specified');
-	  	return;
+function isValidUrl(url){
+	let regexp = /https:\/\/www.youtube.com\/watch\?v=[A-Z,a-z,0-9]+/g;
+	if(regexp.test(url)){
+		return true;
 	}
-	if(isValid)
-	chrome.storage.local.get('playlist', (result) => {
-		if(result.playlist){
-			var dataArr = JSON.parse(result.playlist);
-			dataArr.push(urlVal)
-			save(JSON.stringify(dataArr));
-		}else{
-			console.log("storage empty");
-			var dataArr = [urlVal];
-			save(JSON.stringify(dataArr));
-		}
-
-		if (chrome.runtime.lastError) {
-			console.log('Get Error');
-		}
-    });
-  }
-function save(dataSerialized){
-	chrome.storage.local.set({'playlist': dataSerialized}, () => {
-		// Notify that we saved.
-		console.log('data saved');
-		console.log(dataSerialized);
-	});
-
-	if (chrome.runtime.lastError) {
-		console.log('Save Error');
-	}
-}
-
-function clearPlaylist(){
-	console.log("clearPlaylist");
-	try{
-		chrome.storage.local.clear(()=>{
-			console.log("cleared")
-		});
-	}catch(err){
-		console.log(err);
-	}
+	return false;
 }

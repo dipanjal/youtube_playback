@@ -38,6 +38,7 @@
     ],
     "content_scripts": [
         {
+          "run_at": "document_idle",
           "matches": ["*://*/*","https://www.youtube.com/watch?*","http://*/*", "https://*/*"],
           "js":["content.js"],
           "all_frames": true

@@ -10,6 +10,16 @@ window.addEventListener('load',event=>{
 	// 	callback("ok");
 	// })
 
+
+
+	chrome.runtime.onMessage.addListener((request, sender, sendResponse)=>{
+		console.log(request.event);
+		console.log(request.data);
+		sendResponse(request.event+":: ack from content script");
+	});
+
+
+
 	determinePLayingState(document);
 	console.log('isPlaying: '+isPlaying);
 
@@ -77,7 +87,7 @@ function determinePLayingState(document){
 		// 	console.log('not watch page')
 		// 	isPlaying = false;
 		// }
-		var interval = null;
+		let interval = null;
 		if(isWatchPage()){
 			console.log("watch page");
 			interval = window.setInterval(function(){
@@ -104,7 +114,20 @@ function monitorYTPlayer(document){
 	let videoTag = document.querySelector('video');
 	if(videoTag){
 		console.log('video player found');
-		// determinePLayingState(document);
+
+        // videoTag.addEventListener('mouseover', function() {
+        //     // var selection = videoTag.getSelection().toString().trim();
+        //     console.log("mouse hovered on vid-thumb");
+        //     chrome.runtime.sendMessage({greeting: "hello"}, function(response) {
+        //         console.log(response.farewell);
+        //     });
+        //     // console.log(selection);
+        //     // chrome.runtime.sendMessage({
+        //     //     request: 'updateContextMenu',
+        //     //     selection: selection
+        //     // });
+        // });
+
 		videoTag.addEventListener('ended',function(){
 			console.log("video ended");
 			isPlaying = false;
@@ -135,7 +158,8 @@ function changeTrack(playListArr){
 		console.log('current playlist');
 		console.log(dataSerialized);
 		isPlaying = true;
-		window.location.replace(nextTrack.toString());
+		// window.location.replace(nextTrack.toString());
+		window.location.href = nextTrack.toString();
 	});
 }
 
